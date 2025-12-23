@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>POXERO</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: black;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      cursor: default;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      animation: enter 180ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(4px) scale(.995); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    h1 {
+      font-size: 34px;
+      letter-spacing: 5px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .label {
+      font-size: 12px;
+      opacity: 0.45;
+      letter-spacing: .6px;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 500;
+      min-height: 24px;
+      opacity: 0.9;
+    }
+
+    .subline {
+      font-size: 12px;
+      opacity: 0;
+      min-height: 16px;
+      margin-top: -2px;
+      transition: opacity 160ms ease;
+    }
+
+    .subline.visible {
+      opacity: 0.6;
+    }
+
+    .buttons {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    /* 🔥 ONLY CHANGE IS HERE 🔥 */
+    button {
+      width: 100%;
+      max-width: 290px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: white;
+      color: black;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        background 140ms ease,
+        transform 80ms cubic-bezier(.2,.8,.2,1),
+        opacity 120ms ease;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,0.9);
+    }
+
+    button:active {
+      transform: scale(0.985);
+      opacity: 0.85;
+    }
+    /* 🔥 END OF CHANGE 🔥 */
+
+    .status {
+      min-height: 18px;
+      font-size: 12px;
+      opacity: 0;
+      margin-top: 4px;
+      transition: opacity 160ms ease;
+    }
+
+    .status.visible {
+      opacity: 0.75;
+    }
+
+    .hint {
+      font-size: 11px;
+      opacity: 0.3;
+      margin-top: -2px;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 11px;
+      opacity: 0.55;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .footer span {
+      cursor: pointer;
+      text-decoration: underline;
+      transition: opacity 120ms ease;
+    }
+
+    .footer span:hover {
+      opacity: 0.85;
+    }
+
+    .info-btn {
+      margin-top: 10px;
+      font-size: 22px;
+      opacity: 0.6;
+      cursor: pointer;
+      transition: opacity 120ms ease;
+    }
+
+    .info-btn:hover { opacity: 1; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+    }
+
+    .overlay.show {
+      display: flex;
+      animation: overlayIn 160ms ease-out;
+    }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .overlay-content {
+      max-width: 440px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.7;
+      animation: enter 160ms ease-out;
+    }
+
+    .overlay h2 {
+      font-size: 18px;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .overlay p {
+      margin-bottom: 14px;
+      opacity: 0.9;
+    }
+
+    .overlay .close {
+      border: 1px solid white;
+      padding: 10px 18px;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 120ms ease;
+    }
+
+    .overlay .close:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>POXERO</h1>
+
+    <div class="section">
+      <div class="label">Currently Active App</div>
+      <div id="activeApp" class="value">Loading…</div>
+    </div>
+
+    <div class="section">
+      <div class="label">Memory Pressure</div>
+      <div id="memoryPressure" class="value">—</div>
+      <div id="pausedLine" class="subline"></div>
+    </div>
+
+    <div class="buttons">
+      <button id="fixBtn">Fix App</button>
+      <button id="pauseBtn">Pause Background Apps</button>
+      <button id="boostBtn">Focus Boost</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div class="hint">Press Command + X anytime</div>
+
+    <div class="footer">
+      <span>Sean Davis</span>
+      <span data-url="https://instagram.com/seanpxro">@seanpxro</span>
+      <span data-url="https://instagram.com/crlnasean">@crlnasean</span>
+      <span data-url="https://instagram.com/pxrowrld">@pxrowrld</span>
+    </div>
+
+    <div id="infoBtn" class="info-btn">?</div>
+  </div>
+
+  <div id="infoOverlay" class="overlay">
+    <div class="overlay-content">
+      <h2>What POXERO Does</h2>
+      <p><strong>Fix App</strong> force restarts the active app.</p>
+      <p><strong>Pause Background Apps</strong> safely pauses idle apps.</p>
+      <p><strong>Focus Boost</strong> prioritizes your current app.</p>
+      <div id="closeInfo" class="close">Close</div>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+    const pausedLine = document.getElementById("pausedLine");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(text) {
+      statusEl.classList.remove("visible");
+      setTimeout(() => {
+        statusEl.innerText = text || "";
+        if (text) statusEl.classList.add("visible");
+      }, 60);
+    }
+
+    ipcRenderer.on("active-app", (_, name) => {
+      document.getElementById("activeApp").innerText = name || "Unknown App";
+    });
+
+    ipcRenderer.on("memory-pressure", (_, level) => {
+      document.getElementById("memoryPressure").innerText = level;
+    });
+
+    ipcRenderer.on("paused-update", (_, apps) => {
+      if (apps?.length) {
+        pausedLine.innerText = `Paused: ${apps.join(", ")}`;
+        pausedLine.classList.add("visible");
+      } else {
+        pausedLine.classList.remove("visible");
+      }
+    });
+
+    document.getElementById("fixBtn").onclick = async () => {
+      setStatus("Fixing app…");
+      const r = await ipcRenderer.invoke("fix-app");
+      setStatus(r.message);
+    };
+
+    document.getElementById("pauseBtn").onclick = async () => {
+      setStatus("Pausing background apps…");
+      const r = await ipcRenderer.invoke("pause-background-apps");
+      setStatus(r.message);
+    };
+
+    document.getElementById("boostBtn").onclick = async () => {
+      setStatus("Toggling Focus Boost…");
+      const r = await ipcRenderer.invoke("toggle-focus-boost");
+      setStatus(r.message);
+    };
+
+    document.querySelectorAll("[data-url]").forEach(el =>
+      el.onclick = () => ipcRenderer.invoke("open-link", el.dataset.url)
+    );
+
+    const overlay = document.getElementById("infoOverlay");
+    document.getElementById("infoBtn").onclick = () => overlay.classList.add("show");
+    document.getElementById("closeInfo").onclick = () => overlay.classList.remove("show");
+  </script>
+</body>
+</html>

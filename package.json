@@ -1,0 +1,33 @@
+{
+  "name": "poxero",
+  "version": "0.2.0",
+  "description": "POXERO — honest system control. Nothing hidden.",
+  "main": "main.js",
+  "author": "Sean Davis",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.seandavis.poxero",
+    "productName": "POXERO",
+    "files": [
+      "**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    }
+  }
+}
